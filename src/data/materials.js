@@ -1,0 +1,32 @@
+export const materials = [
+  {
+    id: 1,
+    slug: "nylex",
+    name: "NYLEX German Leather",
+    title: "NYLEX German Leather",
+    type: "3-Year Warranty",
+    description: "German leather material with a 3-year warranty.",
+    colors: [],
+    image: null,
+  },
+  {
+    id: 2,
+    slug: "montecarlo",
+    name: "MONTECARLO Italian Leather",
+    title: "MONTECARLO Italian Leather",
+    type: "5-Year Warranty",
+    description: "Italian leather material with a 5-year warranty.",
+    colors: [],
+    image: null,
+  },
+  {
+    id: 3,
+    slug: "copper",
+    name: "COPPER Italian Leather",
+    title: "COPPER Italian Leather",
+    type: "5-Year Warranty",
+    description: "Italian leather material with a 5-year warranty.",
+    colors: [],
+    image: null,
+  },
+];

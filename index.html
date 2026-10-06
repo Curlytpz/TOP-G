@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem("topg-auto-seat-theme") === "light" ? "light" : "dark";
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.classList.toggle("dark", theme === "dark");
+          document.documentElement.classList.toggle("light", theme === "light");
+        } catch (error) {
+          document.documentElement.dataset.theme = "dark";
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <style>html, body, #root { min-height: 100%; background: #070707; } html[data-theme="light"], html[data-theme="light"] body, html[data-theme="light"] #root { background: #f6f6f4; }</style>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>top-g-auto-seat</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
