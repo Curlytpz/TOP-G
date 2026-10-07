@@ -2,18 +2,26 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+function isCloudflarePreviewHost(hostHeader) {
+  const hostname = String(hostHeader || "").split(":")[0].replace(/\.$/, "").toLowerCase();
+  return hostname === "trycloudflare.com" || hostname.endsWith(".trycloudflare.com");
+}
+
 function previewAdminBlocker() {
   return {
     name: "preview-admin-blocker",
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
         const pathname = request.url?.split("?")[0] ?? "";
-        if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+        const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+
+        if (isAdminPath && isCloudflarePreviewHost(request.headers.host)) {
           response.statusCode = 404;
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end("Admin is not available in the client preview.");
           return;
         }
+
         next();
       });
     },
