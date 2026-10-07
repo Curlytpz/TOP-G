@@ -7,6 +7,12 @@ export function errorHandler(error, request, response, _next) {
   if (error?.code === "LIMIT_FILE_COUNT" || error?.code === "LIMIT_UNEXPECTED_FILE") {
     return response.status(422).json({ error: "VALIDATION_ERROR", message: "You can upload up to 6 images at a time." });
   }
+  if (error?.code === "UPLOAD_UNAVAILABLE") {
+    return response.status(503).json({ error: "UPLOAD_UNAVAILABLE", message: "Cloudinary is not configured." });
+  }
+  if (error?.code === "UPLOAD_FAILED") {
+    return response.status(502).json({ error: "UPLOAD_FAILED", message: "We couldn't upload the image to storage. Please try again." });
+  }
 
   const statusCode = Number.isInteger(error.statusCode) ? error.statusCode : 500;
   const isServerError = statusCode >= 500;

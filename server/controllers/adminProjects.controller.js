@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { deleteProjectImage } from "../lib/cloudinary.js";
 import { AppError } from "../utils/appError.js";
 import { createProjectSchema, projectIdSchema, publishProjectSchema, updateProjectSchema } from "../schemas/project.schema.js";
 
@@ -69,6 +70,40 @@ export async function setAdminProjectPublished(request, response, next) {
     if (!id.success || !body.success) throw validationError();
     const project = await prisma.project.update({ where: { id: id.data.id }, data: { published: body.data.published }, include: projectInclude });
     return response.json({ data: serializeProject(project) });
+  } catch (error) {
+    if (error?.code === "P2025") return next(new AppError("Project not found.", 404, "NOT_FOUND"));
+    return next(error);
+  }
+}
+
+export async function deleteAdminProject(request, response, next) {
+  try {
+    const parsed = projectIdSchema.safeParse(request.params);
+    if (!parsed.success) throw new AppError("Project not found.", 404, "NOT_FOUND");
+
+    const project = await prisma.project.findUnique({
+      where: { id: parsed.data.id },
+      select: { id: true, images: { select: { id: true, publicId: true } } },
+    });
+    if (!project) throw new AppError("Project not found.", 404, "NOT_FOUND");
+
+    try {
+      await Promise.all(project.images.filter((image) => image.publicId).map((image) => deleteProjectImage(image.publicId)));
+    } catch (error) {
+      console.error("[projects] Cloudinary project image cleanup failed.", {
+        projectId: project.id,
+        imageCount: project.images.length,
+        code: error?.code || "UNKNOWN",
+      });
+      throw new AppError("We couldn't remove this project and its images. Please try again.", 502, "PROJECT_DELETE_FAILED");
+    }
+
+    await prisma.$transaction([
+      prisma.projectImage.deleteMany({ where: { projectId: project.id } }),
+      prisma.project.delete({ where: { id: project.id } }),
+    ]);
+
+    return response.status(204).send();
   } catch (error) {
     if (error?.code === "P2025") return next(new AppError("Project not found.", 404, "NOT_FOUND"));
     return next(error);

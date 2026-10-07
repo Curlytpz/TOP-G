@@ -10,13 +10,17 @@ function invalidUpload() {
   return new AppError("Please choose an image type and one or more valid image files.", 422, "VALIDATION_ERROR");
 }
 
+async function cleanUpUploadedImages(images) {
+  await Promise.allSettled(images.map((image) => deleteProjectImage(image.publicId)));
+}
+
 export async function uploadAdminProjectImages(request, response, next) {
   try {
     const params = projectImageParamsSchema.safeParse(request.params);
     const body = projectImageUploadSchema.safeParse(request.body);
     if (!params.success || !body.success || !Array.isArray(request.files) || request.files.length === 0) throw invalidUpload();
     if (request.files.some((file) => !isSupportedImageFile(file))) {
-      throw new AppError("Only valid JPG, JPEG, PNG, and WEBP image files are allowed.", 422, "VALIDATION_ERROR");
+      throw new AppError("Only JPG, PNG, and WEBP files are allowed.", 422, "INVALID_IMAGE_TYPE");
     }
 
     const project = await prisma.project.findUnique({ where: { id: params.data.id }, select: { id: true } });
@@ -25,13 +29,26 @@ export async function uploadAdminProjectImages(request, response, next) {
     const uploaded = [];
     try {
       for (const file of request.files) uploaded.push(await uploadProjectImage(file, project.id));
+    } catch (error) {
+      await cleanUpUploadedImages(uploaded);
+      if (error instanceof AppError) throw error;
+      console.error("[uploads] Cloudinary upload failed.", {
+        projectId: project.id,
+        fileCount: request.files.length,
+        providerStatus: Number.isInteger(error?.http_code) ? error.http_code : undefined,
+      });
+      throw new AppError("We couldn't upload the image to storage. Please try again.", 502, "UPLOAD_FAILED");
+    }
+
+    try {
       const images = await Promise.all(uploaded.map((image) => prisma.projectImage.create({
         data: { projectId: project.id, imageUrl: image.imageUrl, publicId: image.publicId, imageType: body.data.imageType },
         select: safeImageSelect,
       })));
       return response.status(201).json({ data: images });
     } catch (error) {
-      await Promise.allSettled(uploaded.map((image) => deleteProjectImage(image.publicId)));
+      await cleanUpUploadedImages(uploaded);
+      console.error("[uploads] Project image record creation failed.", { projectId: project.id, fileCount: uploaded.length, code: error?.code || "UNKNOWN" });
       throw error;
     }
   } catch (error) { return next(error); }

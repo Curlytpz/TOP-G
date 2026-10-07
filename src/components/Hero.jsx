@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import useTheme from "../hooks/useTheme";
 import FallbackLogo from "./hero/FallbackLogo";
 import { HERO_THEME } from "./hero/logoPieces";
@@ -13,7 +13,27 @@ function HeroFallback() {
 }
 
 function Hero() {
-  return <Suspense fallback={<HeroFallback />}><LogoBuildHero /></Suspense>;
+  const containerRef = useRef(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current) return undefined;
+    if (!("IntersectionObserver" in window)) {
+      const frameId = window.requestAnimationFrame(() => setShouldLoad(true));
+      return () => window.cancelAnimationFrame(frameId);
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setShouldLoad(true);
+      observer.disconnect();
+    }, { rootMargin: "160px" });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return <div ref={containerRef}>{shouldLoad ? <Suspense fallback={<HeroFallback />}><LogoBuildHero /></Suspense> : <HeroFallback />}</div>;
 }
 
 export default Hero;

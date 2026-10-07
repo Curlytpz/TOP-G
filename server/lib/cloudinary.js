@@ -2,9 +2,19 @@ import { v2 as cloudinary } from "cloudinary";
 import { config } from "../config/env.js";
 import { AppError } from "../utils/appError.js";
 
+let missingConfigurationLogged = false;
+
 function ensureCloudinaryConfig() {
   if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
-    throw new AppError("Image uploads are not configured yet.", 503, "UPLOAD_UNAVAILABLE");
+    if (!missingConfigurationLogged) {
+      console.warn("[uploads] Cloudinary configuration is incomplete.", {
+        cloudNameConfigured: Boolean(config.cloudinaryCloudName),
+        apiKeyConfigured: Boolean(config.cloudinaryApiKey),
+        apiSecretConfigured: Boolean(config.cloudinaryApiSecret),
+      });
+      missingConfigurationLogged = true;
+    }
+    throw new AppError("Cloudinary is not configured.", 503, "UPLOAD_UNAVAILABLE");
   }
 }
 
@@ -48,5 +58,7 @@ export function uploadProjectImage(file, projectId) {
 export async function deleteProjectImage(publicId) {
   ensureCloudinaryConfig();
   const result = await cloudinary.uploader.destroy(publicId, { resource_type: "image", invalidate: true });
-  if (result.result !== "ok") throw new AppError("We couldn't remove this image from storage. Please try again.", 502, "UPLOAD_DELETE_FAILED");
+  if (result.result !== "ok" && result.result !== "not found") {
+    throw new AppError("We couldn't remove this image from storage. Please try again.", 502, "UPLOAD_DELETE_FAILED");
+  }
 }

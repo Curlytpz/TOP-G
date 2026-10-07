@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createAdminProject, getAdminProject, listAdminProjects, setAdminProjectPublished, updateAdminProject } from "../controllers/adminProjects.controller.js";
+import { createAdminProject, deleteAdminProject, getAdminProject, listAdminProjects, setAdminProjectPublished, updateAdminProject } from "../controllers/adminProjects.controller.js";
 import { deleteAdminProjectImage, uploadAdminProjectImages } from "../controllers/adminProjectImages.controller.js";
 import { projectImageUpload } from "../middleware/projectImageUpload.js";
 
@@ -12,3 +12,4 @@ adminProjectsRouter.patch("/:id", updateAdminProject);
 adminProjectsRouter.patch("/:id/publish", setAdminProjectPublished);
 adminProjectsRouter.post("/:id/images", projectImageUpload, uploadAdminProjectImages);
 adminProjectsRouter.delete("/:projectId/images/:imageId", deleteAdminProjectImage);
+adminProjectsRouter.delete("/:id", deleteAdminProject);

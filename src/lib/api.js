@@ -26,11 +26,13 @@ export const updateAdminQuoteStatus = (quoteId, status) => request(`/api/admin/q
 export const deleteAdminQuote = (quoteId) => request(`/api/admin/quotes/${quoteId}`, { method: "DELETE" });
 
 export const getPublicProjects = () => request("/api/projects");
+export const getPublicProject = (projectId) => request(`/api/projects/${projectId}`);
 export const getAdminProjects = () => request("/api/admin/projects");
 export const getAdminProject = (projectId) => request(`/api/admin/projects/${projectId}`);
 export const createAdminProject = (payload) => request("/api/admin/projects", json("POST", payload));
 export const updateAdminProject = (projectId, payload) => request(`/api/admin/projects/${projectId}`, json("PATCH", payload));
 export const setAdminProjectPublished = (projectId, published) => request(`/api/admin/projects/${projectId}/publish`, json("PATCH", { published }));
+export const deleteAdminProject = (projectId) => request(`/api/admin/projects/${projectId}`, { method: "DELETE" });
 
 export const uploadAdminProjectImages = (projectId, formData) => request(`/api/admin/projects/${projectId}/images`, { method: "POST", body: formData });
 export const deleteAdminProjectImage = (projectId, imageId) => request(`/api/admin/projects/${projectId}/images/${imageId}`, { method: "DELETE" });

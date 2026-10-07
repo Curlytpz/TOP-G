@@ -36,7 +36,7 @@ function Gallery() {
       {isLoading ? <p className="rounded-xl border border-white/10 bg-zinc-900 p-8 text-zinc-400">Loading projects...</p> : null}
       {error ? <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-8 text-red-100"><p>We couldn't load projects right now.</p><button type="button" onClick={load} className="mt-4 border border-red-400/50 px-4 py-2 text-sm font-bold">Try again</button></div> : null}
       {!isLoading && !error && projects.length === 0 ? <p className="rounded-xl border border-dashed border-white/15 bg-zinc-900 p-10 text-center text-zinc-400">No published projects yet.</p> : null}
-      {!isLoading && !error && projects.length > 0 ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{projects.map((project, index) => <ProjectCard key={project.id} project={project} index={index} />)}</div> : null}
+      {!isLoading && !error && projects.length > 0 ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{projects.map((project, index) => <ProjectCard key={project.id} project={project} index={index} linkToProject />)}</div> : null}
     </div></section>
   </>;
 }

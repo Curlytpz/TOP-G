@@ -7,6 +7,15 @@ import QuoteStatusBadge from "../../components/admin/QuoteStatusBadge";
 import { deleteAdminQuote, getAdminQuote, updateAdminQuoteStatus } from "../../lib/api";
 import { formatDate, formatSubmittedDate, getInstallationLabel, getQuoteServiceNames, getStatusLabel, quoteStatuses } from "../../lib/quotes";
 
+function createMailtoHref(quote) {
+  const subject = "TOP-G Auto Seat Quote";
+  const message = `Hi ${quote.customerName},\n\nThank you for your quote request with TOP-G Auto Seat. We are reviewing your vehicle details and will be happy to assist you.\n\nRegards,\nTOP-G Auto Seat`;
+  return `mailto:${encodeURIComponent(quote.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+}
+
+function createTelephoneHref(phone) {
+  return `tel:${String(phone).replace(/[^\d+]/g, "")}`;
+}
 function DetailCard({ icon: Icon, label, children }) {
   return (
     <article className="rounded-xl border border-white/10 bg-black p-5">
@@ -104,6 +113,9 @@ export default function QuoteDetail() {
   if (isLoading) return <AdminLoading label="Loading quote details..." />;
   if (error || !quote) return <AdminError onRetry={loadQuote} message="We couldn't load this quote. It may no longer be available." />;
 
+  const emailHref = quote.email ? createMailtoHref(quote) : null;
+  const phoneHref = quote.phone ? createTelephoneHref(quote.phone) : null;
+
   return (
     <section>
       <Link to="/admin/quotes" className="inline-flex min-h-10 items-center gap-2 text-sm font-bold text-zinc-400 transition hover:text-white"><ArrowLeft size={17} /> Back to quotes</Link>
@@ -118,7 +130,15 @@ export default function QuoteDetail() {
 
       <div className="mt-8 grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="grid gap-5 md:grid-cols-2">
-          <DetailCard icon={Phone} label="Customer details"><p className="font-bold text-white">{quote.customerName}</p><p>{quote.phone}</p>{quote.email ? <p className="mt-1 break-all text-zinc-400">{quote.email}</p> : <p className="mt-1 text-zinc-500">No email provided</p>}</DetailCard>
+          <DetailCard icon={Phone} label="Customer details">
+            <p className="font-bold text-white">{quote.customerName}</p>
+            <p>{quote.phone}</p>
+            {quote.email ? <p className="mt-1 break-all text-zinc-400">{quote.email}</p> : <p className="mt-1 text-zinc-500">No email provided</p>}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {emailHref ? <a href={emailHref} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 px-3 text-xs font-black uppercase tracking-[0.08em] text-zinc-200 transition hover:border-red-500/60 hover:bg-red-500/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500/40"><Mail size={15} /> Send email</a> : null}
+              {phoneHref ? <a href={phoneHref} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-white/10 px-3 text-xs font-black uppercase tracking-[0.08em] text-zinc-200 transition hover:border-red-500/60 hover:bg-red-500/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500/40"><Phone size={15} /> Call customer</a> : null}
+            </div>
+          </DetailCard>
           <DetailCard icon={CarFront} label="Vehicle details"><p className="font-bold text-white">{quote.carModel}</p><p>{quote.yearModel}</p></DetailCard>
           <DetailCard icon={ClipboardList} label="Requested services">{serviceNames.length ? <ul className="space-y-1 font-bold text-white">{serviceNames.map((name) => <li key={name}>{name}</li>)}</ul> : <p className="font-bold text-white">Not specified</p>}<p className="mt-3 text-xs font-black uppercase tracking-[0.14em] text-zinc-500">Material</p><p className="mt-1">{quote.material?.name || "Not specified"}</p>{quote.material ? <p className="text-zinc-500">{quote.material.type} · {quote.material.warrantyYears}-year warranty</p> : null}</DetailCard>
           <DetailCard icon={CalendarDays} label="Installation & schedule"><p><span className="text-zinc-500">Installation: </span>{getInstallationLabel(quote.installationType)}</p><p className="mt-2"><span className="text-zinc-500">Preferred date: </span>{formatDate(quote.preferredDate)}</p><p className="mt-3 text-xs text-zinc-500">Preferred dates are requests and are not automatically confirmed.</p></DetailCard>

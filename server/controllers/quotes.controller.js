@@ -1,10 +1,7 @@
-import { notifyNewQuote } from "../lib/email.js";
 import { prisma } from "../lib/prisma.js";
 import { verifyTurnstileToken } from "../lib/turnstile.js";
 import { quoteCreateSchema } from "../schemas/quote.schema.js";
 import { AppError } from "../utils/appError.js";
-
-const serviceSelect = { id: true, name: true };
 
 export async function createQuote(request, response, next) {
   const parsed = quoteCreateSchema.safeParse(request.body);
@@ -39,27 +36,12 @@ export async function createQuote(request, response, next) {
       },
       select: {
         id: true,
-        customerName: true,
-        phone: true,
-        email: true,
-        carModel: true,
-        yearModel: true,
-        installationType: true,
-        preferredDate: true,
-        notes: true,
         status: true,
         createdAt: true,
-        quoteServices: { select: { service: { select: serviceSelect } } },
-        material: { select: { id: true, name: true, type: true, warrantyYears: true } },
       },
     });
 
-    const services = quote.quoteServices.map(({ service }) => service);
-    void notifyNewQuote({ ...quote, services, material: quote.material });
-
-    return response.status(201).json({
-      data: { id: quote.id, status: quote.status, createdAt: quote.createdAt },
-    });
+    return response.status(201).json({ data: quote });
   } catch (error) {
     return next(error);
   }

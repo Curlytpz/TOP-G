@@ -1,25 +1,36 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import InitialLoader from "./components/InitialLoader";
 import RequireAdmin from "./components/admin/RequireAdmin";
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
-import Home from "./pages/Home";
-import Services from "./pages/Services";
-import Materials from "./pages/Materials";
-import MaterialDetail from "./pages/MaterialDetail";
-import Gallery from "./pages/Gallery";
-import About from "./pages/About";
-import Quote from "./pages/Quote";
-import Contact from "./pages/Contact";
-import LegalPage from "./components/pageDesign/LegalPage";
 import { privacyContent, termsContent, warrantyContent } from "./data/legalContent";
-import Dashboard from "./pages/admin/Dashboard";
-import AdminLogin from "./pages/admin/AdminLogin";
-import Quotes from "./pages/admin/Quotes";
-import Projects from "./pages/admin/Projects";
-import QuoteDetail from "./pages/admin/QuoteDetail";
-import AdminPlaceholder from "./pages/admin/AdminPlaceholder";
-import ProjectEditor from "./pages/admin/ProjectEditor";
+
+const Home = lazy(() => import("./pages/Home"));
+const Services = lazy(() => import("./pages/Services"));
+const Materials = lazy(() => import("./pages/Materials"));
+const MaterialDetail = lazy(() => import("./pages/MaterialDetail"));
+const Gallery = lazy(() => import("./pages/Gallery"));
+const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
+const About = lazy(() => import("./pages/About"));
+const Quote = lazy(() => import("./pages/Quote"));
+const Contact = lazy(() => import("./pages/Contact"));
+const LegalPage = lazy(() => import("./components/pageDesign/LegalPage"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const Quotes = lazy(() => import("./pages/admin/Quotes"));
+const Projects = lazy(() => import("./pages/admin/Projects"));
+const QuoteDetail = lazy(() => import("./pages/admin/QuoteDetail"));
+const AdminPlaceholder = lazy(() => import("./pages/admin/AdminPlaceholder"));
+const ProjectEditor = lazy(() => import("./pages/admin/ProjectEditor"));
+
+function RouteFallback() {
+  return <div className="min-h-[24rem]" aria-live="polite" aria-label="Loading page" />;
+}
+
+function DeferredPage({ Page, ...props }) {
+  return <Suspense fallback={<RouteFallback />}><Page {...props} /></Suspense>;
+}
 
 function App() {
   return (
@@ -27,30 +38,31 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<PublicLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/materials" element={<Materials />} />
-            <Route path="/materials/:slug" element={<MaterialDetail />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/quote" element={<Quote />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<LegalPage content={privacyContent} />} />
-            <Route path="/terms" element={<LegalPage content={termsContent} />} />
-            <Route path="/warranty" element={<LegalPage content={warrantyContent} />} />
+            <Route path="/" element={<DeferredPage Page={Home} />} />
+            <Route path="/services" element={<DeferredPage Page={Services} />} />
+            <Route path="/materials" element={<DeferredPage Page={Materials} />} />
+            <Route path="/materials/:slug" element={<DeferredPage Page={MaterialDetail} />} />
+            <Route path="/gallery" element={<DeferredPage Page={Gallery} />} />
+            <Route path="/gallery/:id" element={<DeferredPage Page={ProjectDetail} />} />
+            <Route path="/about" element={<DeferredPage Page={About} />} />
+            <Route path="/quote" element={<DeferredPage Page={Quote} />} />
+            <Route path="/contact" element={<DeferredPage Page={Contact} />} />
+            <Route path="/privacy" element={<DeferredPage Page={LegalPage} content={privacyContent} />} />
+            <Route path="/terms" element={<DeferredPage Page={LegalPage} content={termsContent} />} />
+            <Route path="/warranty" element={<DeferredPage Page={LegalPage} content={warrantyContent} />} />
           </Route>
-          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<DeferredPage Page={AdminLogin} />} />
           <Route element={<RequireAdmin />}>
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="quotes" element={<Quotes />} />
-              <Route path="quotes/:id" element={<QuoteDetail />} />
-              <Route path="projects" element={<Projects />} />
-              <Route path="projects/new" element={<ProjectEditor />} />
-              <Route path="projects/:id" element={<ProjectEditor />} />
-              <Route path="materials" element={<AdminPlaceholder title="Materials" />} />
-              <Route path="services" element={<AdminPlaceholder title="Services" />} />
-              <Route path="testimonials" element={<AdminPlaceholder title="Testimonials" />} />
+              <Route index element={<DeferredPage Page={Dashboard} />} />
+              <Route path="quotes" element={<DeferredPage Page={Quotes} />} />
+              <Route path="quotes/:id" element={<DeferredPage Page={QuoteDetail} />} />
+              <Route path="projects" element={<DeferredPage Page={Projects} />} />
+              <Route path="projects/new" element={<DeferredPage Page={ProjectEditor} />} />
+              <Route path="projects/:id" element={<DeferredPage Page={ProjectEditor} />} />
+              <Route path="materials" element={<DeferredPage Page={AdminPlaceholder} title="Materials" />} />
+              <Route path="services" element={<DeferredPage Page={AdminPlaceholder} title="Services" />} />
+              <Route path="testimonials" element={<DeferredPage Page={AdminPlaceholder} title="Testimonials" />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

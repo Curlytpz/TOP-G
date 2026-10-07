@@ -1,7 +1,11 @@
 import multer from "multer";
 import { AppError } from "../utils/appError.js";
 
-const allowedMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+export const projectImageFieldName = "images";
+export const maxProjectImageBytes = 8 * 1024 * 1024;
+export const maxProjectImageFiles = 6;
+
+const allowedMimeTypes = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 export function isSupportedImageFile(file) {
   const bytes = file?.buffer;
@@ -14,11 +18,11 @@ export function isSupportedImageFile(file) {
 
 export const projectImageUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024, files: 6 },
+  limits: { fileSize: maxProjectImageBytes, files: maxProjectImageFiles },
   fileFilter: (_request, file, callback) => {
     if (!allowedMimeTypes.has(file.mimetype)) {
-      return callback(new AppError("Only JPG, JPEG, PNG, and WEBP image files are allowed.", 422, "VALIDATION_ERROR"));
+      return callback(new AppError("Only JPG, PNG, and WEBP files are allowed.", 422, "INVALID_IMAGE_TYPE"));
     }
     return callback(null, true);
   },
-}).array("images", 6);
+}).array(projectImageFieldName, maxProjectImageFiles);

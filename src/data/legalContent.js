@@ -22,7 +22,7 @@ export const privacyContent = {
       title: "Service providers and infrastructure",
       paragraphs: [
         "To operate the website and handle quote requests, information may be processed by necessary service providers that support website, application, database, and transactional-email infrastructure. These providers process information only as needed to provide their services to TOP-G Auto Seat.",
-        "This may include managed database infrastructure and a transactional email provider used for quote-related notifications. TOP-G Auto Seat may also use other necessary providers as its services evolve.",
+        "This may include managed database infrastructure and other necessary providers used to operate the website and quote-request workflow as services evolve.",
       ],
     },
     {

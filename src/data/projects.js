@@ -1,9 +1,9 @@
-const galleryAssets = import.meta.glob("../assets/gallery/*.png", {
+const galleryAssets = import.meta.glob("../assets/gallery/*.webp", {
   eager: true,
   import: "default",
 });
 
-const galleryImage = (filename) => galleryAssets[`../assets/gallery/${filename}`];
+const galleryImage = (filename) => galleryAssets[`../assets/gallery/${filename.replace(/\.png$/, ".webp")}`];
 export const projects = [
   {
     id: "cream-brown-01",
