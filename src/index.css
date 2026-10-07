@@ -841,3 +841,13 @@ html[data-theme="light"] .tg-turnstile__message.is-error { color: #b91c1c; }
 .tg-before-after__handle:focus-visible { outline: 3px solid var(--tg-red); outline-offset: 3px; }
 @media (min-width: 900px) { .tg-project-detail__layout { grid-template-columns: minmax(0, 1.18fr) minmax(17rem, .82fr); } .tg-project-detail__comparison-section { grid-template-columns: minmax(13rem, .4fr) minmax(0, 1fr); align-items: center; } }
 @media (max-width: 639px) { .tg-project-detail__nav { height: 2.3rem; width: 2.3rem; } .tg-project-detail__nav--previous { left: .55rem; } .tg-project-detail__nav--next { right: .55rem; } .tg-project-detail__counter { bottom: .55rem; right: .55rem; } .tg-project-detail__main-image > span { bottom: .55rem; left: .55rem; } .tg-before-after__label { top: .55rem; } .tg-before-after__label--before { left: .55rem; } .tg-before-after__label--after { right: .55rem; } }
+
+/* Public gallery request error: theme-aware contrast without changing behavior. */
+.tg-gallery-error { align-items: center; background: rgba(127, 29, 29, .44); border: 1px solid rgba(248, 113, 113, .65); border-radius: .75rem; color: #fee2e2; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; padding: clamp(1.25rem, 3vw, 1.75rem); }
+.tg-gallery-error p { font-size: .9375rem; font-weight: 750; line-height: 1.55; margin: 0; }
+.tg-gallery-error button { background: var(--tg-red); border: 1px solid var(--tg-red); color: #fff; cursor: pointer; flex: 0 0 auto; font: inherit; font-size: .75rem; font-weight: 900; letter-spacing: .05em; min-height: 2.65rem; padding: .55rem .95rem; text-transform: uppercase; transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease; }
+.tg-gallery-error button:hover { background: #bd111b; border-color: #bd111b; transform: translateY(-1px); }
+.tg-gallery-error button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+html[data-theme="light"] .tg-gallery-error { background: #fff1f2; border-color: #fda4af; color: #881337; }
+html[data-theme="light"] .tg-gallery-error button:focus-visible { outline-color: #881337; }
+@media (max-width: 480px) { .tg-gallery-error { align-items: stretch; flex-direction: column; } .tg-gallery-error button { width: 100%; } }
