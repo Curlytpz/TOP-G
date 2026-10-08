@@ -867,7 +867,6 @@ html[data-theme="light"] .tg-gallery-error button:focus-visible { outline-color:
 .tg-quote-messenger-link, .tg-quote-home-link { align-items: center; box-sizing: border-box; display: inline-flex; font-size: .78rem; font-weight: 900; gap: .5rem; justify-content: center; letter-spacing: .05em; min-height: 3rem; padding: .75rem 1rem; text-align: center; text-decoration: none; text-transform: uppercase; transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease; }
 .tg-quote-messenger-link { background: var(--tg-red); border: 1px solid var(--tg-red); color: #fff; }
 .tg-quote-messenger-link:hover { background: #bd111b; border-color: #bd111b; color: #fff; transform: translateY(-1px); }
-.tg-quote-messenger-link.is-unavailable { background: color-mix(in srgb, var(--tg-muted) 35%, var(--tg-card-bg)); border-color: var(--tg-border); color: var(--tg-muted); cursor: not-allowed; }
 .tg-quote-home-link { border: 1px solid var(--tg-border); color: var(--tg-text); }
 .tg-quote-home-link:hover { border-color: var(--tg-red); color: var(--tg-red); }
 .tg-quote-messenger-link:focus-visible, .tg-quote-home-link:focus-visible, .tg-quote-copy-message button:focus-visible { outline: 2px solid var(--tg-red); outline-offset: 3px; }

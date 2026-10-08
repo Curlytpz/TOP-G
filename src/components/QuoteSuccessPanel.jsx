@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-
-function quoteReferenceFromId(quoteId) {
-  const suffix = String(quoteId || "").replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
-  return suffix ? "TG-" + suffix : "TG-REQUEST";
-}
+import { formatQuoteReference } from "../lib/quoteReference";
 
 export default function QuoteSuccessPanel({ quoteId }) {
   const [isCopied, setIsCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
-  const messengerUrl = (import.meta.env.VITE_MESSENGER_URL || "").trim();
-  const quoteReference = quoteReferenceFromId(quoteId);
+  const messengerUrl = (import.meta.env.VITE_MESSENGER_URL || "https://www.facebook.com/share/19eix9M81x/").trim();
+  const quoteReference = formatQuoteReference(quoteId);
   const messengerMessage = "Hi TOP-G, I just submitted quote request " + quoteReference + " for my vehicle.";
 
   const copyMessage = async () => {
@@ -45,12 +41,11 @@ export default function QuoteSuccessPanel({ quoteId }) {
       <p>We’ve received your vehicle details. TOP-G Auto Seat will review your request. For faster assistance, continue the conversation with us on Messenger.</p>
       <div className="tg-quote-reference"><span>Quote reference</span><strong>{quoteReference}</strong></div>
       <div className="tg-quote-success-panel__actions">
-        {messengerUrl ? <a className="tg-quote-messenger-link" href={messengerUrl} target="_blank" rel="noopener noreferrer"><MessageCircle size={18} aria-hidden="true" /> Continue on Messenger</a> : <span className="tg-quote-messenger-link is-unavailable" aria-disabled="true"><MessageCircle size={18} aria-hidden="true" /> Continue on Messenger</span>}
+        <a className="tg-quote-messenger-link" href={messengerUrl} target="_blank" rel="noopener noreferrer"><MessageCircle size={18} aria-hidden="true" /> Continue on Facebook Messenger</a>
         <Link to="/" className="tg-quote-home-link">Back to Home</Link>
       </div>
       <div className="tg-quote-copy-message"><p>{messengerMessage}</p><button type="button" onClick={copyMessage}>{isCopied ? <><Check size={16} aria-hidden="true" /> Copied</> : <><Copy size={16} aria-hidden="true" /> Copy Message</>}</button></div>
       {copyError ? <p className="tg-quote-messenger-note is-error" role="alert">{copyError}</p> : null}
-      {!messengerUrl ? <p className="tg-quote-messenger-note">Messenger follow-up will be available once TOP-G configures its Messenger link.</p> : null}
     </section>
   );
 }

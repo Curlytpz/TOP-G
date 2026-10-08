@@ -6,6 +6,7 @@ import DeleteQuoteModal from "../../components/admin/DeleteQuoteModal";
 import QuoteStatusBadge from "../../components/admin/QuoteStatusBadge";
 import { deleteAdminQuote, getAdminQuote, updateAdminQuoteStatus } from "../../lib/api";
 import { formatDate, formatSubmittedDate, getInstallationLabel, getQuoteServiceNames, getStatusLabel, quoteStatuses } from "../../lib/quotes";
+import { formatQuoteReference } from "../../lib/quoteReference";
 
 function createMailtoHref(quote) {
   const subject = "TOP-G Auto Seat Quote";
@@ -115,6 +116,7 @@ export default function QuoteDetail() {
 
   const emailHref = quote.email ? createMailtoHref(quote) : null;
   const phoneHref = quote.phone ? createTelephoneHref(quote.phone) : null;
+  const quoteReference = formatQuoteReference(quote.id);
 
   return (
     <section>
@@ -123,6 +125,7 @@ export default function QuoteDetail() {
         <div>
           <p className="text-xs font-black uppercase tracking-[0.2em] text-red-500">Quote request</p>
           <h1 className="mt-3 text-[clamp(2rem,6vw,2.5rem)] font-black">{quote.customerName}</h1>
+          <div className="mt-3 inline-flex items-center gap-3 rounded-lg border border-red-500/35 bg-red-500/10 px-3 py-2"><span className="text-[.65rem] font-black uppercase tracking-[.16em] text-red-300">Quote ref</span><strong className="font-mono text-sm font-black tracking-[.08em] text-white">{quoteReference}</strong></div>
           <p className="mt-2 text-zinc-400">Submitted {formatSubmittedDate(quote.createdAt)}</p>
         </div>
         <QuoteStatusBadge status={quote.status} />
