@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/env.js";
 
 export const AUTH_COOKIE_NAME = "topg_admin_session";
+const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 
 function getJwtSecret() {
   if (!config.jwtSecret) throw new Error("JWT_SECRET is not configured.");
@@ -26,11 +27,13 @@ export function verifyAuthToken(token) {
 }
 
 export function authCookieOptions() {
+  const isProduction = config.nodeEnv === "production";
+
   return {
     httpOnly: true,
-    sameSite: "lax",
-    secure: config.nodeEnv === "production",
-    maxAge: 8 * 60 * 60 * 1000,
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+    maxAge: SESSION_MAX_AGE_MS,
     path: "/",
   };
 }

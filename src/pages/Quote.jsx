@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, CarFront, CheckCircle2, Clock3, House, MapPin, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { CalendarDays, CarFront, Check, CheckCircle2, Clock3, Copy, House, MapPin, MessageCircle, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { ApiError, getMaterials, getServices, submitQuote } from "../lib/api";
 import PageHeader from "../components/pageDesign/PageHeader";
 import Reveal from "../components/motion/Reveal";
@@ -39,6 +39,11 @@ function ErrorText({ id, text }) {
   return text ? <p id={id} className="tg-quote-error" role="alert">{text}</p> : null;
 }
 
+function quoteReferenceFromId(quoteId) {
+  const suffix = String(quoteId || "").replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
+  return suffix ? "TG-" + suffix : "TG-REQUEST";
+}
+
 function Quote() {
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
@@ -49,10 +54,15 @@ function Quote() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isComplete, setIsComplete] = useState(false);
+  const [submittedQuoteId, setSubmittedQuoteId] = useState("");
+  const [isMessageCopied, setIsMessageCopied] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const { theme } = useTheme();
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+  const messengerUrl = (import.meta.env.VITE_MESSENGER_URL || "").trim();
+  const quoteReference = quoteReferenceFromId(submittedQuoteId);
+  const messengerMessage = "Hi TOP-G, I just submitted quote request " + quoteReference + " for my vehicle.";
 
   const loadCatalog = useCallback(async () => {
     setIsCatalogLoading(true);
@@ -116,6 +126,28 @@ function Quote() {
     if (token) setSubmitError("");
   }, []);
 
+  const copyMessengerMessage = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(messengerMessage);
+      } else {
+        const copyField = document.createElement("textarea");
+        copyField.value = messengerMessage;
+        copyField.setAttribute("readonly", "");
+        copyField.style.position = "fixed";
+        copyField.style.opacity = "0";
+        document.body.appendChild(copyField);
+        copyField.select();
+        document.execCommand("copy");
+        copyField.remove();
+      }
+      setIsMessageCopied(true);
+      window.setTimeout(() => setIsMessageCopied(false), 1800);
+    } catch {
+      setSubmitError("We couldn't copy the message. Please select and copy it manually.");
+    }
+  };
+
   const submit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
@@ -159,7 +191,8 @@ function Quote() {
     if (form.notes.trim()) payload.notes = form.notes.trim();
 
     try {
-      await submitQuote(payload);
+      const response = await submitQuote(payload);
+      setSubmittedQuoteId(response?.data?.id || "");
       setForm(emptyForm);
       setErrors({});
       setIsComplete(true);
