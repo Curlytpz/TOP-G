@@ -851,3 +851,33 @@ html[data-theme="light"] .tg-turnstile__message.is-error { color: #b91c1c; }
 html[data-theme="light"] .tg-gallery-error { background: #fff1f2; border-color: #fda4af; color: #881337; }
 html[data-theme="light"] .tg-gallery-error button:focus-visible { outline-color: #881337; }
 @media (max-width: 480px) { .tg-gallery-error { align-items: stretch; flex-direction: column; } .tg-gallery-error button { width: 100%; } }
+
+/* Quote completion: customer-controlled Messenger follow-up. */
+.tg-quote-success-panel { animation: tg-quote-success-reveal 320ms cubic-bezier(.22,1,.36,1) both; background: var(--tg-card-bg); border: 1px solid color-mix(in srgb, var(--tg-red) 48%, var(--tg-border)); border-radius: 14px; box-shadow: var(--tg-card-shadow); color: var(--tg-text); min-width: 0; overflow: hidden; padding: clamp(1.35rem, 4vw, 2.5rem); position: relative; }
+.tg-quote-success-panel::after { background: linear-gradient(135deg, color-mix(in srgb, var(--tg-red) 11%, transparent), transparent 48%); content: ""; inset: 0; pointer-events: none; position: absolute; }
+.tg-quote-success-panel > * { position: relative; z-index: 1; }
+.tg-quote-success-panel__icon { align-items: center; background: var(--tg-red); border-radius: 999px; color: #fff; display: inline-flex; height: 3.25rem; justify-content: center; width: 3.25rem; }
+.tg-quote-success-panel .tg-quote-kicker { color: var(--tg-red); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: .6875rem; font-weight: 900; letter-spacing: .16em; margin: 1.25rem 0 0; text-transform: uppercase; }
+.tg-quote-success-panel h2 { color: var(--tg-text); font-size: clamp(1.85rem, 4vw, 3rem); font-weight: 900; letter-spacing: -.045em; line-height: .95; margin: .65rem 0 0; text-transform: uppercase; }
+.tg-quote-success-panel > p:not(.tg-quote-kicker):not(.tg-quote-messenger-note) { color: var(--tg-muted); font-size: .95rem; line-height: 1.7; margin: 1rem 0 0; max-width: 57ch; }
+.tg-quote-reference { align-items: center; background: color-mix(in srgb, var(--tg-red) 8%, var(--tg-page-bg)); border: 1px solid color-mix(in srgb, var(--tg-red) 33%, var(--tg-border)); display: flex; flex-wrap: wrap; gap: .55rem 1rem; justify-content: space-between; margin-top: 1.5rem; padding: .85rem 1rem; }
+.tg-quote-reference span { color: var(--tg-muted); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: .67rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.tg-quote-reference strong { color: var(--tg-red); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: .95rem; letter-spacing: .08em; }
+.tg-quote-success-panel__actions { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.25rem; }
+.tg-quote-messenger-link, .tg-quote-home-link { align-items: center; box-sizing: border-box; display: inline-flex; font-size: .78rem; font-weight: 900; gap: .5rem; justify-content: center; letter-spacing: .05em; min-height: 3rem; padding: .75rem 1rem; text-align: center; text-decoration: none; text-transform: uppercase; transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease; }
+.tg-quote-messenger-link { background: var(--tg-red); border: 1px solid var(--tg-red); color: #fff; }
+.tg-quote-messenger-link:hover { background: #bd111b; border-color: #bd111b; color: #fff; transform: translateY(-1px); }
+.tg-quote-messenger-link.is-unavailable { background: color-mix(in srgb, var(--tg-muted) 35%, var(--tg-card-bg)); border-color: var(--tg-border); color: var(--tg-muted); cursor: not-allowed; }
+.tg-quote-home-link { border: 1px solid var(--tg-border); color: var(--tg-text); }
+.tg-quote-home-link:hover { border-color: var(--tg-red); color: var(--tg-red); }
+.tg-quote-messenger-link:focus-visible, .tg-quote-home-link:focus-visible, .tg-quote-copy-message button:focus-visible { outline: 2px solid var(--tg-red); outline-offset: 3px; }
+.tg-quote-copy-message { align-items: stretch; background: color-mix(in srgb, var(--tg-text) 4%, transparent); border: 1px solid var(--tg-border); display: flex; flex-direction: column; gap: .75rem; margin-top: 1rem; padding: .85rem; }
+.tg-quote-copy-message p { color: var(--tg-muted); font-size: .8125rem; line-height: 1.55; margin: 0; overflow-wrap: anywhere; }
+.tg-quote-copy-message button { align-items: center; align-self: flex-start; background: transparent; border: 1px solid var(--tg-border); color: var(--tg-text); cursor: pointer; display: inline-flex; font: inherit; font-size: .7rem; font-weight: 900; gap: .4rem; justify-content: center; letter-spacing: .05em; min-height: 2.45rem; padding: .45rem .7rem; text-transform: uppercase; }
+.tg-quote-copy-message button:hover { border-color: var(--tg-red); color: var(--tg-red); }
+.tg-quote-messenger-note { color: var(--tg-muted); font-size: .75rem; line-height: 1.5; margin: .8rem 0 0; }
+.tg-quote-messenger-note.is-error { color: #fb7185; }
+html[data-theme="light"] .tg-quote-messenger-note.is-error { color: #b91c1c; }
+@keyframes tg-quote-success-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 640px) { .tg-quote-success-panel__actions { flex-direction: row; } .tg-quote-messenger-link, .tg-quote-home-link { flex: 1; } .tg-quote-copy-message { align-items: center; flex-direction: row; justify-content: space-between; } .tg-quote-copy-message button { flex: 0 0 auto; } }
+@media (prefers-reduced-motion: reduce) { .tg-quote-success-panel { animation: none; } .tg-quote-messenger-link:hover { transform: none; } }

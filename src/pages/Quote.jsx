@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, CarFront, Check, CheckCircle2, Clock3, Copy, House, MapPin, MessageCircle, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { CalendarDays, CarFront, CheckCircle2, Clock3, House, MapPin, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { ApiError, getMaterials, getServices, submitQuote } from "../lib/api";
 import PageHeader from "../components/pageDesign/PageHeader";
 import Reveal from "../components/motion/Reveal";
 import TurnstileChallenge from "../components/TurnstileChallenge";
+import QuoteSuccessPanel from "../components/QuoteSuccessPanel";
 import useTheme from "../hooks/useTheme";
 
 const installations = [
@@ -39,11 +40,6 @@ function ErrorText({ id, text }) {
   return text ? <p id={id} className="tg-quote-error" role="alert">{text}</p> : null;
 }
 
-function quoteReferenceFromId(quoteId) {
-  const suffix = String(quoteId || "").replace(/[^a-zA-Z0-9]/g, "").slice(-6).toUpperCase();
-  return suffix ? "TG-" + suffix : "TG-REQUEST";
-}
-
 function Quote() {
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
@@ -55,15 +51,10 @@ function Quote() {
   const [submitError, setSubmitError] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [submittedQuoteId, setSubmittedQuoteId] = useState("");
-  const [isMessageCopied, setIsMessageCopied] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const { theme } = useTheme();
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
-  const messengerUrl = (import.meta.env.VITE_MESSENGER_URL || "").trim();
-  const quoteReference = quoteReferenceFromId(submittedQuoteId);
-  const messengerMessage = "Hi TOP-G, I just submitted quote request " + quoteReference + " for my vehicle.";
-
   const loadCatalog = useCallback(async () => {
     setIsCatalogLoading(true);
     setCatalogError("");
@@ -125,28 +116,6 @@ function Quote() {
     setTurnstileToken(token);
     if (token) setSubmitError("");
   }, []);
-
-  const copyMessengerMessage = async () => {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(messengerMessage);
-      } else {
-        const copyField = document.createElement("textarea");
-        copyField.value = messengerMessage;
-        copyField.setAttribute("readonly", "");
-        copyField.style.position = "fixed";
-        copyField.style.opacity = "0";
-        document.body.appendChild(copyField);
-        copyField.select();
-        document.execCommand("copy");
-        copyField.remove();
-      }
-      setIsMessageCopied(true);
-      window.setTimeout(() => setIsMessageCopied(false), 1800);
-    } catch {
-      setSubmitError("We couldn't copy the message. Please select and copy it manually.");
-    }
-  };
 
   const submit = async (event) => {
     event.preventDefault();
@@ -222,7 +191,7 @@ function Quote() {
   return <main className="tg-page tg-surface tg-quote">
     <PageHeader label="Get a quote" pageName="Get a Quote" title="Shape your ideal interior." description="Tell us what you drive and the finish you have in mind. We’ll use these details to prepare your quotation." />
     <section className="tg-page-content"><div className="tg-page-container tg-quote-layout">
-      <Reveal as="form" className="tg-quote-form" onSubmit={submit} noValidate>
+      {isComplete ? <QuoteSuccessPanel quoteId={submittedQuoteId} /> : <Reveal as="form" className="tg-quote-form" onSubmit={submit} noValidate>
         <div className="tg-quote-form-intro"><span className="tg-quote-form-intro__icon"><Sparkles size={18} aria-hidden="true" /></span><div><p className="tg-quote-kicker">Your project details</p><p>Fields marked <span aria-hidden="true">*</span> are required.</p></div></div>
         {catalogError && <div className="tg-quote-catalog-error" role="alert"><span>{catalogError}</span><button type="button" onClick={loadCatalog}>Retry</button></div>}
         <section className="tg-quote-section" aria-labelledby="customer-details">{sectionHeading("01", "customer-details", "Customer details", "How we can reach you about your project.")}<div className="tg-quote-field-grid">{textField("fullName", "Full name", { autoComplete: "name", placeholder: "Your full name" })}{textField("phone", "Phone number", { type: "tel", autoComplete: "tel", inputMode: "tel", placeholder: "e.g. 0930 367 9533" })}{textField("email", "Email address", { type: "email", autoComplete: "email", placeholder: "you@example.com", optional: true, wide: true })}</div></section>
@@ -232,11 +201,10 @@ function Quote() {
         <fieldset className="tg-quote-section tg-quote-fieldset" aria-describedby={errors.installation ? "installation-error" : undefined} data-invalid={Boolean(errors.installation)}><legend className="tg-quote-section-heading"><span>05</span><span><strong>Installation</strong><small>Walk-ins and appointments are accepted; most installations are scheduled. <b aria-hidden="true">*</b></small></span></legend><div className="tg-quote-selection-grid tg-quote-selection-grid--installation">{installations.map((installation) => <button key={installation.value} type="button" className={cardClass("installation", installation.value, "tg-quote-installation-option")} onClick={() => select("installation", installation.value)} aria-pressed={form.installation === installation.value}><House size={18} aria-hidden="true" /><strong>{installation.label}</strong><CheckCircle2 className="tg-quote-option__check" size={18} aria-hidden="true" /></button>)}</div><ErrorText id="installation-error" text={errors.installation} /></fieldset>
         <section className="tg-quote-section" aria-labelledby="schedule-notes">{sectionHeading("06", "schedule-notes", "Preferred schedule & notes", "Optional details that help us start the conversation.")}<label className="tg-quote-field"><span>Preferred schedule <em>Optional</em></span><input name="preferredDate" type="date" value={form.preferredDate} onChange={(event) => update("preferredDate", event.target.value)} /><small className="tg-quote-help"><CalendarDays size={15} aria-hidden="true" /> This is only a preferred schedule and is not automatically confirmed.</small></label><label className="tg-quote-field tg-quote-field--notes"><span>Additional notes <em>Optional</em></span><textarea name="notes" value={form.notes} onChange={(event) => update("notes", event.target.value)} placeholder="Tell us your preferred color, design, or other requests." /></label></section>
         {submitError && <div className="tg-quote-submit-error" role="alert">{submitError}</div>}
-        {isComplete && <div className="tg-quote-success" role="status"><CheckCircle2 size={21} aria-hidden="true" /><div><strong>Your quote request has been submitted successfully.</strong><p>TOP-G Auto Seat will contact you after reviewing your vehicle details.</p></div></div>}
         <TurnstileChallenge siteKey={turnstileSiteKey} theme={theme} resetKey={turnstileResetKey} onTokenChange={handleTurnstileToken} />
         <p className="tg-quote-privacy-notice">By submitting this form, you acknowledge that TOP-G Auto Seat will use the information you provide to review your request, prepare a quotation, and contact you regarding your inquiry. Your preferred schedule is not automatically confirmed. <Link to="/privacy">Privacy Notice</Link><span aria-hidden="true"> · </span><Link to="/terms">Terms &amp; Conditions</Link></p>
         <button className="tg-quote-submit" type="submit" disabled={isSubmitting || isCatalogLoading || Boolean(catalogError) || !turnstileToken}>{isSubmitting ? "Submitting..." : "Request a quote"}</button>
-      </Reveal>
+      </Reveal>}
       <Reveal as="aside" delay={100} className="tg-quote-sidebar"><div className="tg-quote-sidebar__lead"><CarFront size={23} aria-hidden="true" /><p className="tg-quote-kicker">Plan your visit</p><h2>Made for your schedule.</h2><p>Walk in or reserve a time—our team is ready to help plan your installation.</p></div><dl className="tg-quote-info-list"><div><Clock3 size={18} aria-hidden="true" /><dt>Operating hours</dt><dd>8:00 AM – 5:00 PM</dd></div><div><MapPin size={18} aria-hidden="true" /><dt>Location</dt><dd>Sitio Visitas, Sta. Maria, Mexico, Pampanga</dd></div><div><CalendarDays size={18} aria-hidden="true" /><dt>Visit options</dt><dd>Walk-ins & scheduled appointments accepted</dd></div><div><House size={18} aria-hidden="true" /><dt>Installation</dt><dd>Home service available</dd></div></dl><div className="tg-quote-sidebar__note"><ShieldCheck size={18} aria-hidden="true" /><p>Most installations are scheduled so we can prepare the right materials and fit for your vehicle.</p></div></Reveal>
     </div></section>
   </main>;
