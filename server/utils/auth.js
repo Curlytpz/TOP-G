@@ -27,12 +27,12 @@ export function verifyAuthToken(token) {
 }
 
 export function authCookieOptions() {
-  const isProduction = config.nodeEnv === "production";
+  const usesCrossSiteCookie = config.usesCrossSiteAuthCookie;
 
   return {
     httpOnly: true,
-    sameSite: isProduction ? "none" : "lax",
-    secure: isProduction,
+    sameSite: usesCrossSiteCookie ? "none" : "lax",
+    secure: usesCrossSiteCookie,
     maxAge: SESSION_MAX_AGE_MS,
     path: "/",
   };

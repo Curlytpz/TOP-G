@@ -4,12 +4,31 @@ export class ApiError extends Error {
   constructor(message, status, body) { super(message); this.name = "ApiError"; this.status = status; this.body = body; }
 }
 
+function failureCategory(status) {
+  if (status === 401) return "session";
+  if (status === 403) return "authorization-or-cors";
+  if (status >= 500) return "server";
+  return "request";
+}
+
 async function request(path, options = {}) {
   let response;
-  try { response = await fetch(`${API_BASE_URL}${path}`, { credentials: "include", ...options, headers: { Accept: "application/json", ...options.headers } }); }
-  catch { throw new ApiError("Network request failed.", 0); }
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      credentials: "include",
+      headers: { Accept: "application/json", ...options.headers },
+    });
+  } catch {
+    if (import.meta.env.DEV) console.warn("[api] request failed", { path, status: 0, category: "network" });
+    throw new ApiError("Network request failed.", 0);
+  }
+
   const body = await response.json().catch(() => null);
-  if (!response.ok) throw new ApiError("API request failed.", response.status, body);
+  if (!response.ok) {
+    if (import.meta.env.DEV) console.warn("[api] request failed", { path, status: response.status, category: failureCategory(response.status) });
+    throw new ApiError("API request failed.", response.status, body);
+  }
   return body;
 }
 const json = (method, body) => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });

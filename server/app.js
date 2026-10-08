@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { config } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
+import { requestDiagnostics } from "./middleware/requestDiagnostics.js";
 import { apiLimiter } from "./middleware/rateLimiters.js";
 import { adminRouter } from "./routes/admin.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
@@ -42,6 +43,7 @@ app.use(
 app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 app.use(cookieParser());
+app.use(requestDiagnostics);
 
 app.use("/api", apiLimiter);
 app.use("/api/health", healthRouter);

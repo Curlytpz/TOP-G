@@ -14,10 +14,16 @@ function isHttpsOrigin(value) {
   }
 }
 
+const nodeEnv = (process.env.NODE_ENV || "development").toLowerCase();
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://127.0.0.1:5173";
+
 export const config = Object.freeze({
-  nodeEnv: process.env.NODE_ENV || "development",
+  nodeEnv,
   port: parsePort(process.env.PORT),
-  clientOrigin: process.env.CLIENT_ORIGIN || "http://127.0.0.1:5173",
+  clientOrigin,
+  // A configured HTTPS frontend means browser auth crosses origins. Do not fall
+  // back to a development cookie if a host omits NODE_ENV in production.
+  usesCrossSiteAuthCookie: nodeEnv === "production" || isHttpsOrigin(clientOrigin),
   jwtSecret: process.env.JWT_SECRET || "",
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
