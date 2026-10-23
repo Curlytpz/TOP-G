@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-export default function SeatIcon({ size = 112, className = '' }) {
+export default function SeatIcon({ size = 128, className = '' }) {
   const u = useId().replace(/:/g, '');
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">

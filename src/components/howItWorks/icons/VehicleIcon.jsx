@@ -3,7 +3,13 @@ import { useId } from 'react';
 export default function VehicleIcon({ size = 112, className = '' }) {
   const u = useId().replace(/:/g, '');
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+   <svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 128 128"
+  width={size}
+  height={size}
+  className={className}
+>
     <defs>
     <linearGradient id={`${u}body`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ff5a5f"/><stop offset=".3" stopColor="#e31b23"/><stop offset=".75" stopColor="#a50f16"/><stop offset="1" stopColor="#5e0810"/></linearGradient>
     <linearGradient id={`${u}glass`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5a6272"/><stop offset=".5" stopColor="#181b22"/><stop offset="1" stopColor="#0a0b0e"/></linearGradient>
